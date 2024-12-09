@@ -12,6 +12,7 @@ import (
 
 func TestCreateIntegration(t *testing.T) {
 	db, err := connection.TestConnectPostgres()
+	defer db.Close()
 	assert.NoError(t, err)
 
 	repo := repositories.NewUserRepository(db)

@@ -16,6 +16,8 @@ func main() {
 
 func run() error {
 	db, err := connection.ConnectPostgres()
+	defer db.Close()
+
 	if err != nil {
 		return err
 	}

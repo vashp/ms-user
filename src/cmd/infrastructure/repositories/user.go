@@ -20,12 +20,14 @@ func (r *UserRepository) Create(ctx context.Context, user *domain.User) error {
 	query, args, err := squirrel.Insert("users").
 		Columns("email").
 		Values(user.Email).
+		Suffix("RETURNING \"id\"").
+		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
 		return err
 	}
 
-	_, err = r.db.Exec(query, args...)
+	err = r.db.QueryRow(query, args...).Scan(&user.ID)
 	return err
 }
 
@@ -33,6 +35,7 @@ func (r *UserRepository) GetByID(ctx context.Context, id int) (*domain.User, err
 	query, args, err := squirrel.Select("id", "email").
 		From("users").
 		Where(squirrel.Eq{"id": id}).
+		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -55,6 +58,7 @@ func (r *UserRepository) Update(ctx context.Context, user *domain.User) error {
 	query, args, err := squirrel.Update("users").
 		Set("email", user.Email).
 		Where(squirrel.Eq{"id": user.ID}).
+		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
 		return err
@@ -67,6 +71,7 @@ func (r *UserRepository) Update(ctx context.Context, user *domain.User) error {
 func (r *UserRepository) Delete(ctx context.Context, id int) error {
 	query, args, err := squirrel.Delete("users").
 		Where(squirrel.Eq{"id": id}).
+		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
 		return err
